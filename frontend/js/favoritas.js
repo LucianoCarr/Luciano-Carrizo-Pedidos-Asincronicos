@@ -6,22 +6,24 @@ window.onload = async () => {
 
   // Aqui debemos agregar nuestro fetch
 
-  const favoritas = JSON.parse(sessionStorage.getItem("favorites"))
+  const favoritas = JSON.parse(localStorage.getItem("favorites")) || []
   console.log(favoritas);
 
+
+  if (favoritas.length > 0) {
+  
   try {
     
     const response =  await fetch('http://localhost:3031/api/movies')
-    const result = await response.json()
+    const {meta , data} = await response.json()
 
-    let data = result.data;
+    //let data = result.data;
 
-    data.forEach((movie) => {
+    const pelis = data.filter(peli => favoritas.includes(peli.id))
 
-      if (favoritas.includes(movie.id)) {
-        
-     
-      const card = document.createElement("div");
+    pelis.forEach((movie) => {
+
+     const card = document.createElement("div");
       card.setAttribute("class", "card");
 
       const h1 = document.createElement("h1");
@@ -37,10 +39,25 @@ window.onload = async () => {
       link.classList.add('ver')
       link.textContent = "ver mas"
       link.setAttribute('href',`formulario.html?movie=${movie.id}`)
+
+      container.appendChild(card);
+      card.appendChild(h1);
+      card.appendChild(p);
+      if (movie.genre !== null) {
+        const genero = document.createElement("p");
+        genero.textContent = `Genero: ${movie.genre.name}`;
+        card.appendChild(genero);
       }
+      card.appendChild(duracion);
+      card.appendChild(link);
     });
 
   } catch (error) {
     console.error('Error al obtener datos:', error);
   }
+} else {
+  const error = document.createElement("h2");
+  error.innerHTML = "No hay peliculas favoritas"
+  container.appendChild(error);
+}
 };

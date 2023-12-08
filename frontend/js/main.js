@@ -1,21 +1,21 @@
-const favoriteClick = (event) => {
-  event.preventDefault()
 
-  console.log(event.target);
-  event.target.classList.toggle("fa-regular")
-  event.target.classList.toggle("fa-solid")
-
-  const favoritas = JSON.parse(sessionStorage.getItem("favorites"))
-  
-  if (favoritas.includes(id)) {
-    sessionStorage.setItem('favorites', JSON.stringify(favoritas.filter(favorite => favorite !== id)))
-  } else {
-    favoritas.push(id)
-    sessionStorage.setItem("favorites", JSON.stringify(favoritas))
-  }
-}
 
 window.onload = async () => {
+  const favoritas = JSON.parse(localStorage.getItem("favorites")) || []
+
+const favoriteClick = (event, id) => {
+  
+  console.log(event.target);
+  event.target.classList.toggle("fa-solid")
+   event.target.classList.toggle("fa-regular")
+  if (favoritas.includes(id)) {
+    favoritas.splice(favoritas.indexOf(id),1)
+  } else {
+    favoritas.push(id)
+  }
+  localStorage.setItem('favorites', JSON.stringify(favoritas))
+}
+
   const app = document.getElementById("root");
   const container = document.createElement("div");
   container.setAttribute("class", "container");
@@ -47,12 +47,19 @@ window.onload = async () => {
       link.textContent = "ver mas"
       link.setAttribute('href',`formulario.html?movie=${movie.id}`)
 
-      const favoriteLink = document.createElement("a")
+      const favoriteLink = document.createElement("i")
       favoriteLink.style.display = "flex"
       favoriteLink.style.justifyContent = "center"
-      favoriteLink.innerHTML = '<a href="#" onclick("favoriteClick(event)")=><i class="fa-regular fa-heart"></i></a>'
-      favoriteLink.setAttribute("href","a")
-      favoriteLink.setAttribute("onclick", "favoriteClick(event)")
+      favoriteLink.classList.add("fa-regular", "fa-heart")
+
+      if (favoritas.includes(movie.id)) {
+        favoriteLink.classList.remove("fa-regular", "fa-heart")
+        favoriteLink.classList.add("fa-solid", "fa-heart")
+      }
+
+      favoriteLink.addEventListener("click", function(event){
+        favoriteClick(event, movie.id)
+      })
 
       container.appendChild(card);
       card.appendChild(h1);
